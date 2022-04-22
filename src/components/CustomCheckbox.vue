@@ -64,7 +64,7 @@ function handleInput($event) {
   height: 1em;
   border: 2px solid currentColor;
   border-radius: 0.2em;
-  background: rgba(255 255 255 / 0.5);
+  background: #fff;
 }
 
 .custom-checkbox input[type="checkbox"] {
@@ -74,6 +74,7 @@ function handleInput($event) {
   position: absolute;
   left: 0.5em;
   top: 0.4em;
+  cursor: pointer;
 }
 
 .custom-checkbox svg path {
