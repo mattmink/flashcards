@@ -9,6 +9,7 @@
 
 <script setup>
 import { computed } from "vue";
+import { operatorChars } from "../constants";
 
 const props = defineProps({
   a: {
@@ -30,11 +31,7 @@ const props = defineProps({
 });
 
 const operator = computed(() => {
-  if (props.operation === "add") return "&plus;";
-  if (props.operation === "subtract") return "&minus;";
-  if (props.operation === "multiply") return "&times;";
-  if (props.operation === "divide") return "&divide;";
-  return "";
+  return operatorChars[props.operation] || "";
 });
 </script>
 

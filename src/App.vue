@@ -34,6 +34,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
+import { operations } from "./constants";
 import Card from "./components/Card.vue";
 import CustomCheckbox from "./components/CustomCheckbox.vue";
 
@@ -56,12 +57,6 @@ recognition.lang = "en-US";
 recognition.interimResults = false;
 recognition.maxAlternatives = 1;
 
-const operations = {
-  add: "add",
-  subtract: "subtract",
-  multiply: "multiply",
-  divide: "divide",
-};
 const operationFns = {
   [operations.add]: (a, b) => a + b,
   [operations.subtract]: (a, b) => a - b,
