@@ -1,0 +1,28 @@
+type SpeechAlias {
+  value: String!
+  alias: String!
+  type: String!
+  owner: User!
+}
+
+type User {
+  name: String! @unique
+  role: String!
+}
+
+input UserInput {
+  name: String!
+  password: String!
+}
+
+type Query {
+  currentUser: User! @resolver(name: "getCurrentUser")
+  speechAliasesByType(type: String!): [SpeechAlias!]!
+  allUsers: [User!]
+}
+
+type Mutation {
+  createUser(input: UserInput): User! @resolver(name: "registerUser")
+  loginUser(input: UserInput): String! @resolver(name: "loginUser")
+  logoutUser: Boolean @resolver(name: "logoutUser")
+}

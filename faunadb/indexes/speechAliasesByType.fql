@@ -1,0 +1,11 @@
+{
+  name: "speechAliasesByType",
+  unique: false,
+  serialized: true,
+  source: "SpeechAlias",
+  terms: [
+    {
+      field: ["data", "type"]
+    }
+  ]
+}

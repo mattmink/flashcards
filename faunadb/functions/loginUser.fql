@@ -1,0 +1,11 @@
+Query(
+  Lambda(
+    ["input"],
+    Select(
+      "secret",
+      Login(Match(Index("unique_User_email"), Select("email", Var("input"))), {
+        password: Select("password", Var("input"))
+      })
+    )
+  )
+)
