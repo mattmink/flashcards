@@ -4,6 +4,7 @@
     <FlashCard
       :a="currentEquation[0]"
       :b="currentEquation[1]"
+      :answer="answer"
       :operation="operations.add"
     />
   </div>
@@ -61,6 +62,7 @@ const completed = ref([]);
 const startTime = ref(null);
 const totalTime = ref(null);
 const workingOn = ref([]);
+const answer = ref(null);
 
 // COMPUTED DATA
 const currentEquation = computed(() => equations.value[0]);
@@ -71,6 +73,13 @@ const isRunning = computed(() => isStarted.value && !isCompleted.value);
 
 const totalTimeFormatted = computed(
   () => `${Math.round(totalTime.value / 100) / 10} seconds`
+);
+
+const correctSolution = computed(() =>
+  // TODO: Allow option to change operation (currently only allows add)
+  !currentEquation.value
+    ? null
+    : operationFns[operations.add](...currentEquation.value)
 );
 
 // METHODS
@@ -102,24 +111,25 @@ const endRound = async () => {
 
 const attemptEquation = (solution) => {
   const numeric = Number(solution);
-
-  // TODO: Allow option to change operation (currently only allows add)
-  const correctSolution = operationFns[operations.add](
-    ...currentEquation.value
-  );
-  const isCorrect = !Number.isNaN(numeric) && numeric === correctSolution;
+  const isCorrect = !Number.isNaN(numeric) && numeric === correctSolution.value;
 
   // TODO: Allow option to keep going when answered incorrectly
   if (!isCorrect) {
-    console.log(`Solution: ${correctSolution}\nI heard: "${solution}"`);
+    console.log(`Solution: ${correctSolution.value}\nI heard: "${solution}"`);
     return;
   }
 
+  answer.value = "";
   completed.value.unshift([...equations.value.shift(), numeric, isCorrect]);
 };
 
 recognition.onresult = (event) => {
   const [{ transcript }] = event.results[event.resultIndex];
+
+  if (transcript.trim() === "help") {
+    answer.value = correctSolution.value;
+    return;
+  }
 
   attemptEquation(transcript.trim());
 
