@@ -1,22 +1,30 @@
 <template>
-  <header>
-    <nav>
-      <RouterLink to="/" class="nav-brand">Flash Cards</RouterLink>
-    </nav>
-  </header>
-  {{user}}
-  <LoginForm v-if="!user" />
-  <RouterView v-else />
-</template>
+  <LoadingOverlay v-if="isLoading || isInitialLoading">
+    <template #title v-if="isInitialLoading">
+      <div class="loading-title">Flash Cards</div>
+    </template>
+  </LoadingOverlay>
 
+  <template v-else>
+    <MainNav />
+    <LoginForm v-if="!user" />
+    <div v-else class="content">
+      <RouterView />
+    </div>
+  </template>
+</template>
 
 <script setup>
 import { ref } from "vue";
 import { RouterView } from "vue-router";
 import useAuth from "./composables/auth";
+import useLoading from "./composables/loading";
 import LoginForm from "./components/LoginForm.vue";
+import LoadingOverlay from "./components/LoadingOverlay.vue";
+import MainNav from "./components/MainNav.vue";
 
 const { user, getCurrentUser } = useAuth();
+const { isLoading } = useLoading();
 const isInitialLoading = ref(true);
 
 getCurrentUser().finally(() => {
@@ -26,4 +34,17 @@ getCurrentUser().finally(() => {
 
 <style>
 @import "./assets/base.css";
+</style>
+
+<style scoped>
+.loading-title {
+  color: #e2e7ff;
+  opacity: 0.5;
+  font-size: 3rem;
+  font-weight: 900;
+}
+
+.content {
+  padding: 1rem;
+}
 </style>

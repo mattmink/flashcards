@@ -3,7 +3,7 @@ Query(
     ["input"],
     Select(
       "secret",
-      Login(Match(Index("unique_User_email"), Select("email", Var("input"))), {
+      Login(Match(Index("unique_User_name"), Select("name", Var("input"))), {
         password: Select("password", Var("input"))
       })
     )

@@ -3,10 +3,7 @@ Query(
     ["input"],
     Create(Collection("User"), {
       credentials: { password: Select("password", Var("input")) },
-      data: {
-        email: Select("email", Var("input")),
-        name: Select("name", Var("input"))
-      }
+      data: { name: Select("name", Var("input")), role: "student" }
     })
   )
 )

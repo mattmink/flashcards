@@ -38,7 +38,7 @@ const operator = computed(() => {
 <style scoped>
 .card {
   background: #fff;
-  font-size: 16vmin;
+  font-size: 14vmin;
   max-width: 5.625em;
   max-height: 5em;
   aspect-ratio: 3 / 5;

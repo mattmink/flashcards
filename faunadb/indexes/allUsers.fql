@@ -1,0 +1,6 @@
+{
+  name: "allUsers",
+  unique: false,
+  serialized: true,
+  source: "User"
+}
