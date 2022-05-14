@@ -38,16 +38,10 @@ import { ref, computed } from "vue";
 import { operations } from "../constants";
 import FlashCard from "../components/FlashCard.vue";
 import CustomCheckbox from "../components/CustomCheckbox.vue";
+import useSpeechRecognition from "../composables/speechRecognition";
 
 const zeroThroughTwelve = [...Array(13)].map((_, i) => i);
 const oneThroughTwelve = zeroThroughTwelve.slice(1);
-
-const recognition = new SpeechRecognition();
-
-recognition.continuous = true;
-recognition.lang = "en-US";
-recognition.interimResults = false;
-recognition.maxAlternatives = 1;
 
 const operationFns = {
   [operations.add]: (a, b) => a + b,
@@ -123,25 +117,25 @@ const attemptEquation = (solution) => {
   completed.value.unshift([...equations.value.shift(), numeric, isCorrect]);
 };
 
-recognition.onresult = (event) => {
-  const [{ transcript }] = event.results[event.resultIndex];
+const recognition = useSpeechRecognition(
+  // onResult
+  (response) => {
+    if (response === "help") {
+      answer.value = correctSolution.value;
+      return;
+    }
 
-  if (transcript.trim() === "help") {
-    answer.value = correctSolution.value;
-    return;
+    attemptEquation(response);
+
+    if (equations.value.length === 0) {
+      endRound();
+      return;
+    }
+  },
+  // onError
+  () => {
+    startTime.value = null;
+    totalTime.value = null;
   }
-
-  attemptEquation(transcript.trim());
-
-  if (equations.value.length === 0) {
-    endRound();
-    return;
-  }
-};
-
-recognition.onerror = function (event) {
-  startTime.value = null;
-  totalTime.value = null;
-  console.error(event);
-};
+);
 </script>
