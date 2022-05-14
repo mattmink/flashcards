@@ -2,7 +2,11 @@
   <div class="login-form">
     <h1>Who is ready to practice?</h1>
     <div v-for="user in users" :key="user._id">
-      <button class="button" type="button" @click="handleClick(user)">
+      <button
+        class="button button-large"
+        type="button"
+        @click="handleClick(user)"
+      >
         {{ user.name }}
       </button>
     </div>
@@ -31,11 +35,7 @@ query("allUsers { data { _id, name, role } }").then(
 <style scoped>
 .button {
   margin: 1rem;
-  /* display: block; */
   width: 100%;
-  padding: .75rem;
-  font-size: 1.25rem;
-  height: auto;
   max-width: 300px;
 }
 .login-form {

@@ -1,34 +1,38 @@
 <template>
-  <h1>Math &ndash; Addition</h1>
-  <div v-if="isRunning">
-    <FlashCard
-      :a="currentEquation[0]"
-      :b="currentEquation[1]"
-      :answer="answer"
-      :operation="operations.add"
-    />
-  </div>
-  <div v-else-if="!isStarted">
-    <h2>What do you want to master?</h2>
-    <div class="working-on">
-      <div v-for="number in oneThroughTwelve" :key="number">
-        <CustomCheckbox :value="number" v-model="workingOn">{{
-          number
-        }}</CustomCheckbox>
-      </div>
+  <div>
+    <h1>Math &ndash; Addition</h1>
+    <div v-if="isRunning">
+      <FlashCard
+        :a="currentEquation[0]"
+        :b="currentEquation[1]"
+        :answer="answer"
+        :operation="operations.add"
+      />
     </div>
-    <button class="button" @click="startRound">Start!</button>
-  </div>
-  <div v-else-if="isCompleted">
-    <h2>You did it!</h2>
-    <p>
-      You completed {{ completed.length }} cards in
-      <strong>{{ totalTimeFormatted }}</strong
-      >.
-    </p>
-    <div class="end-buttons">
-      <button class="button" @click="startRound">Try again</button>
-      <button class="button" @click="startTime = null">Pick new numbers</button>
+    <div v-else-if="!isStarted">
+      <h2>What do you want to master?</h2>
+      <div class="working-on">
+        <div v-for="number in oneThroughTwelve" :key="number">
+          <CustomCheckbox :value="number" v-model="workingOn">{{
+            number
+          }}</CustomCheckbox>
+        </div>
+      </div>
+      <button class="button" @click="startRound">Start!</button>
+    </div>
+    <div v-else-if="isCompleted">
+      <h2>You did it!</h2>
+      <p>
+        You completed {{ completed.length }} cards in
+        <strong>{{ totalTimeFormatted }}</strong
+        >.
+      </p>
+      <div class="end-buttons">
+        <button class="button" @click="startRound">Try again</button>
+        <button class="button" @click="startTime = null">
+          Pick new numbers
+        </button>
+      </div>
     </div>
   </div>
 </template>

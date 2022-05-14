@@ -3,7 +3,13 @@
     <nav>
       <RouterLink to="/" class="nav-brand">Flash Cards</RouterLink>
       <div class="main-nav" v-if="user">
-        <div class="nav-item nav-user">Hello, {{ user.name }}!</div>
+        <RouterLink to="/" class="nav-item">Math</RouterLink>
+        <RouterLink to="/speech-training" class="nav-item"
+          >Speech Training</RouterLink
+        >
+      </div>
+      <div class="nav-user">
+        <div class="nav-item nav-item-user">Hello, {{ user.name }}!</div>
         <a class="nav-item" href="#" @click.prevent="logout">Log out</a>
       </div>
     </nav>
@@ -23,16 +29,14 @@ header {
   box-shadow: 0 0.25rem 0.5rem rgba(0 0 0 / 0.2);
   color: #fff;
   padding: 0 1rem;
+  font-size: 0.75rem;
 }
 
 nav,
-.main-nav {
+.main-nav,
+.nav-user {
   display: flex;
   align-items: center;
-}
-
-nav {
-  justify-content: space-between;
 }
 
 .nav-brand {
@@ -45,15 +49,37 @@ nav {
   padding: 0.5rem;
 }
 
-.main-nav .nav-item {
+.nav-user {
+  margin-left: auto;
+}
+
+.nav-item {
   color: inherit;
   text-decoration: none;
   display: block;
   line-height: 1;
-  padding: 0.75rem;
+  padding: 0.33rem;
+  transition: background-color ease-in 0.2s;
 }
 
-.nav-user {
+.main-nav .nav-item {
+  margin-left: 1rem;
+  border-radius: 0.125rem;
+}
+
+.nav-item.router-link-active {
+  background-color: #fff;
+  color: #333;
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .main-nav .nav-item:not(.router-link-active):hover {
+    background-color: #555;
+  }
+}
+
+.nav-item-user {
   opacity: 0.5;
 }
 </style>

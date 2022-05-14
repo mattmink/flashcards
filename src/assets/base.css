@@ -28,6 +28,10 @@ body {
   background-attachment: fixed;
 }
 
+p + p {
+  margin-top: 1rem;
+}
+
 #app {
   min-height: 100%;
   display: flex;
@@ -91,6 +95,21 @@ body {
     rgba(50, 151, 211, 0.3) 0 0 0 4px;
 }
 
-.end-buttons .button {
-  margin: 0 0.5rem;
+.button-large {
+  padding: .75rem;
+  font-size: 1.25rem;
+  height: auto;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  align-items: center;
+  justify-content: center;
+}
+
+.view {
+  flex: 1;
 }
