@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from "vue";
+import { computed, ref } from "vue";
 import useAliases from "../composables/aliases";
 import useSpeechRecognition from "../composables/speechRecognition";
 import FcButton from "../components/FcButton.vue";

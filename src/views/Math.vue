@@ -38,12 +38,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { operations } from "../constants";
 import CustomCheckbox from "../components/CustomCheckbox.vue";
 import useSpeechRecognition from "../composables/speechRecognition";
 import MathCard from "../components/flash-cards/MathCard.vue";
 import FcButton from "../components/FcButton.vue";
+import useAliases from "../composables/aliases";
+
+const { getAliases, aliasesByType } = useAliases();
 
 const zeroThroughTwelve = [...Array(13)].map((_, i) => i);
 const oneThroughTwelve = zeroThroughTwelve.slice(1);
@@ -81,6 +84,17 @@ const correctSolution = computed(() =>
     : operationFns[operations.add](...currentEquation.value)
 );
 
+const numbersByAlias = computed(() => {
+  const aliases = aliasesByType.number;
+
+  if (!aliases) return {};
+
+  return aliases.reduce((aliasMap, { value, alias }) => {
+    aliasMap[alias] = value;
+    return aliasMap;
+  }, {});
+});
+
 // METHODS
 const resetEquations = () => {
   const equationBaseNumbers = workingOn.value.length
@@ -108,9 +122,11 @@ const endRound = async () => {
   totalTime.value = Date.now() - startTime.value;
 };
 
+
 const attemptEquation = (solution) => {
   const numeric = Number(solution);
-  const isCorrect = !Number.isNaN(numeric) && numeric === correctSolution.value;
+  const isNumberAlias = numbersByAlias.value[solution] === String(correctSolution.value);
+  const isCorrect = numeric === correctSolution.value || isNumberAlias;
 
   // TODO: Allow option to keep going when answered incorrectly
   if (!isCorrect) {
@@ -143,4 +159,8 @@ const recognition = useSpeechRecognition(
     totalTime.value = null;
   }
 );
+
+onMounted(() => {
+  getAliases("number");
+});
 </script>

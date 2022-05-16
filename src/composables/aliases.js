@@ -9,7 +9,7 @@ const aliasesByType = reactive({
 });
 
 const getAliases = async (type) => {
-  if (!aliasesByType[type]) return undefined;
+  if (!aliasesByType[type] || aliasesByType[type].length) return aliasesByType[type];
 
   try {
     const {
