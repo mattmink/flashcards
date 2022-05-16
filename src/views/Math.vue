@@ -2,7 +2,7 @@
   <div>
     <h1>Math &ndash; Addition</h1>
     <div v-if="isRunning">
-      <FlashCard
+      <MathCard
         :a="currentEquation[0]"
         :b="currentEquation[1]"
         :answer="answer"
@@ -18,7 +18,7 @@
           }}</CustomCheckbox>
         </div>
       </div>
-      <button class="button" @click="startRound">Start!</button>
+      <FcButton class="button" @click="startRound">Start!</FcButton>
     </div>
     <div v-else-if="isCompleted">
       <h2>You did it!</h2>
@@ -28,10 +28,10 @@
         >.
       </p>
       <div class="end-buttons">
-        <button class="button" @click="startRound">Try again</button>
-        <button class="button" @click="startTime = null">
+        <FcButton class="button" @click="startRound">Try again</FcButton>
+        <FcButton class="button" @click="startTime = null">
           Pick new numbers
-        </button>
+        </FcButton>
       </div>
     </div>
   </div>
@@ -40,9 +40,10 @@
 <script setup>
 import { ref, computed } from "vue";
 import { operations } from "../constants";
-import FlashCard from "../components/FlashCard.vue";
 import CustomCheckbox from "../components/CustomCheckbox.vue";
 import useSpeechRecognition from "../composables/speechRecognition";
+import MathCard from "../components/flash-cards/MathCard.vue";
+import FcButton from "../components/FcButton.vue";
 
 const zeroThroughTwelve = [...Array(13)].map((_, i) => i);
 const oneThroughTwelve = zeroThroughTwelve.slice(1);

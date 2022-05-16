@@ -1,8 +1,10 @@
 import { ref } from "vue";
 import { gql } from "graphql-request";
 import { request, setToken } from "../db";
+import useLoading from "./loading";
 
 const user = ref(null);
+const { setLoading, clearLoading } = useLoading();
 
 async function getCurrentUser() {
   try {
@@ -23,6 +25,8 @@ async function getCurrentUser() {
 async function login(name, password) {
   if (!name || !password) return;
 
+  setLoading();
+
   try {
     const { loginUser: token } = await request(gql`
       mutation {
@@ -38,6 +42,8 @@ async function login(name, password) {
     setToken();
     throw new Error(error);
   }
+  
+  clearLoading();
 }
 
 async function register(name, password) {
@@ -56,6 +62,8 @@ async function register(name, password) {
 }
 
 async function logout() {
+  setLoading();
+
   await request(
     gql`
       mutation {
@@ -65,6 +73,8 @@ async function logout() {
   );
   setToken();
   user.value = null;
+
+  clearLoading();
 }
 
 function withOwner(obj = {}) {

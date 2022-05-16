@@ -23,7 +23,7 @@ export default function useSpeechRecognition(
   recognition.onerror = (error) => {
     console.error(error);
     onError(error);
-  }
+  };
 
   return recognition;
 }

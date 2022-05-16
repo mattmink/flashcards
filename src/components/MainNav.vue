@@ -8,7 +8,7 @@
           >Speech Training</RouterLink
         >
       </div>
-      <div class="nav-user">
+      <div class="nav-user" v-if="user">
         <div class="nav-item nav-item-user">Hello, {{ user.name }}!</div>
         <a class="nav-item" href="#" @click.prevent="logout">Log out</a>
       </div>

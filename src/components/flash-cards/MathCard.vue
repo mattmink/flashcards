@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <FlashCard class="math-card">
     <div class="number a">{{ a }}</div>
     <div class="operator" v-html="operator"></div>
     <div class="number b">{{ b }}</div>
@@ -7,12 +7,13 @@
       <span v-if="answer || answer === 0" class="answer-text">{{ answer }}</span>
       <span v-else>&nbsp;</span>
     </div>
-  </div>
+  </FlashCard>
 </template>
 
 <script setup>
 import { computed } from "vue";
-import { operatorChars } from "../constants";
+import { operatorChars } from "../../constants";
+import FlashCard from "./FlashCard.vue";
 
 const props = defineProps({
   a: {
@@ -39,20 +40,12 @@ const operator = computed(() => {
 </script>
 
 <style scoped>
-.card {
-  background: #fff;
-  font-size: 14vmin;
-  max-width: 5.625em;
-  max-height: 5em;
-  aspect-ratio: 3 / 5;
-  box-shadow: 0 0.25em 0.5em -0.25em rgba(0 0 0 / 0.75);
-  border-radius: 0.125em;
+.math-card {
   display: grid;
-  font-family: "Jost", sans-serif;
   grid-template-columns: 1fr max-content;
   align-items: baseline;
+  justify-content: unset;
   font-variant: common-ligatures tabular-nums;
-  padding: 0.25em;
 }
 
 .a,

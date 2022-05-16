@@ -2,13 +2,13 @@
   <div class="login-form">
     <h1>Who is ready to practice?</h1>
     <div v-for="user in users" :key="user._id">
-      <button
+      <FcButton
         class="button button-large"
         type="button"
         @click="handleClick(user)"
       >
         {{ user.name }}
-      </button>
+      </FcButton>
     </div>
   </div>
 </template>
@@ -17,6 +17,7 @@
 import { ref } from "vue";
 import useAuth from "../composables/auth";
 import { query } from "../db";
+import FcButton from "./FcButton.vue";
 
 const users = ref([]);
 const auth = useAuth();
