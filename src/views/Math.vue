@@ -45,6 +45,7 @@ import useSpeechRecognition from "../composables/speechRecognition";
 import MathCard from "../components/flash-cards/MathCard.vue";
 import FcButton from "../components/FcButton.vue";
 import useAliases from "../composables/aliases";
+import { shuffleArray } from "../utils/arrays";
 
 const { getAliases, aliasesByType } = useAliases();
 
@@ -101,12 +102,9 @@ const resetEquations = () => {
     ? workingOn.value
     : oneThroughTwelve;
 
-  equations.value = equationBaseNumbers
-    .flatMap((a) =>
-      zeroThroughTwelve.map((b) => ({ value: [a, b], sort: Math.random() }))
-    )
-    .sort((a, b) => a.sort - b.sort)
-    .map(({ value }) => value);
+  equations.value = shuffleArray(
+    equationBaseNumbers.flatMap((a) => zeroThroughTwelve.map((b) => [a, b]))
+  );
   completed.value = [];
 };
 
@@ -122,10 +120,10 @@ const endRound = async () => {
   totalTime.value = Date.now() - startTime.value;
 };
 
-
 const attemptEquation = (solution) => {
   const numeric = Number(solution);
-  const isNumberAlias = numbersByAlias.value[solution] === String(correctSolution.value);
+  const isNumberAlias =
+    numbersByAlias.value[solution] === String(correctSolution.value);
   const isCorrect = numeric === correctSolution.value || isNumberAlias;
 
   // TODO: Allow option to keep going when answered incorrectly
