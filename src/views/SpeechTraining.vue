@@ -58,7 +58,7 @@ const isStarted = ref(false);
 const isComplete = ref(false);
 const isLoading = ref(false);
 const { getAliases, aliasesByType, createAlias } = useAliases();
-const trainingList = ref(shuffleArray([...numbers, ...numbers, ...numbers]));
+const trainingList = ref(shuffleArray([...numbers, ...numbers]));
 
 const currentNumber = computed(() => trainingList.value[0]);
 const numbersByAlias = computed(() => {
