@@ -6,6 +6,7 @@
 
 <style scoped>
 .card {
+  margin: auto;
   background: #fff;
   font-size: 14vmin;
   max-width: 5.625em;

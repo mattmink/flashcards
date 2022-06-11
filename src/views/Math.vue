@@ -1,24 +1,47 @@
 <template>
   <div>
-    <h1>Math &ndash; Addition</h1>
+    <h1>
+      Math<span v-if="selectedOperation"> &ndash; {{ operationTitle }}</span>
+    </h1>
     <div v-if="isRunning">
       <MathCard
         :a="currentEquation[0]"
         :b="currentEquation[1]"
         :answer="answer"
-        :operation="operations.add"
+        :operation="selectedOperation"
       />
     </div>
     <div v-else-if="!isStarted">
       <h2>What do you want to master?</h2>
-      <div class="working-on">
-        <div v-for="number in oneThroughTwelve" :key="number">
-          <CustomCheckbox :value="number" v-model="workingOn">{{
-            number
-          }}</CustomCheckbox>
-        </div>
+      <div v-if="!selectedOperation">
+        <FcButton
+          v-for="(_, operation) in availableOperations"
+          class="button"
+          @click="selectedOperation = operation"
+          >{{ operationTitles[operation] }}<br /><span
+            class="operation-button-character"
+            v-html="operatorChars[operation]"
+        /></FcButton>
       </div>
-      <FcButton class="button" @click="startRound">Start!</FcButton>
+      <div v-else>
+        <h3>
+          {{ operationTitle }}
+          <a
+            href="#"
+            @click.prevent="selectedOperation = null"
+            class="remove-operation-link"
+            >↩️ undo</a
+          >
+        </h3>
+        <div class="working-on">
+          <div v-for="number in oneThroughTwelve" :key="number">
+            <CustomCheckbox :value="number" v-model="workingOn">{{
+              number
+            }}</CustomCheckbox>
+          </div>
+        </div>
+        <FcButton class="button" @click="startRound">Start!</FcButton>
+      </div>
     </div>
     <div v-else-if="isCompleted">
       <h2>You did it!</h2>
@@ -27,7 +50,7 @@
         <strong>{{ totalTimeFormatted }}</strong
         >.
       </p>
-      <div class="end-buttons">
+      <div>
         <FcButton class="button" @click="startRound">Try again</FcButton>
         <FcButton class="button" @click="startTime = null">
           Pick new numbers
@@ -39,7 +62,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { operations } from "../constants";
+import { operations, operatorChars } from "../constants";
 import CustomCheckbox from "../components/CustomCheckbox.vue";
 import useSpeechRecognition from "../composables/speechRecognition";
 import MathCard from "../components/flash-cards/MathCard.vue";
@@ -58,6 +81,20 @@ const operationFns = {
   [operations.multiply]: (a, b) => a * b,
   [operations.divide]: (a, b) => a / b,
 };
+const operationTitles = {
+  [operations.add]: "Addition",
+  [operations.subtract]: "Subtraction",
+  [operations.multiply]: "Multiplication",
+  [operations.divide]: "Division",
+};
+
+// TODO: This is temporary. I need to add more logic to the resetEquations function for subtraction and division
+const availableOperations = Object.fromEntries(
+  Object.entries(operations).filter(
+    ([operation]) =>
+      operation === operations.add || operation === operations.multiply
+  )
+);
 
 // REACTIVE DATA
 const equations = ref([]);
@@ -66,9 +103,19 @@ const startTime = ref(null);
 const totalTime = ref(null);
 const workingOn = ref([]);
 const answer = ref(null);
+const selectedOperation = ref(null);
 
 // COMPUTED DATA
 const currentEquation = computed(() => equations.value[0]);
+const operationFn = computed(() => {
+  if (!selectedOperation.value) {
+    return () => {};
+  }
+  return operationFns[selectedOperation.value];
+});
+const operationTitle = computed(
+  () => operationTitles[selectedOperation.value] || ""
+);
 
 const isStarted = computed(() => Boolean(startTime.value));
 const isCompleted = computed(() => isStarted.value && Boolean(totalTime.value));
@@ -79,10 +126,7 @@ const totalTimeFormatted = computed(
 );
 
 const correctSolution = computed(() =>
-  // TODO: Allow option to change operation (currently only allows add)
-  !currentEquation.value
-    ? null
-    : operationFns[operations.add](...currentEquation.value)
+  !currentEquation.value ? null : operationFn.value(...currentEquation.value)
 );
 
 const numbersByAlias = computed(() => {
@@ -162,3 +206,28 @@ onMounted(() => {
   getAliases("number");
 });
 </script>
+
+<style scoped>
+.working-on {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  max-width: 320px;
+  margin: 0.5rem auto 1rem;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.button {
+  margin: 1rem;
+}
+
+.operation-button-character {
+  font-size: 2rem;
+}
+
+.remove-operation-link {
+  font-size: 0.75rem;
+  text-decoration: none;
+  margin-left: 0.5rem;
+}
+</style>
