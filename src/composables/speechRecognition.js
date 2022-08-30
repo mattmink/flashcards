@@ -5,7 +5,8 @@ const SR =
 
 export default function useSpeechRecognition(
   onResult = () => {},
-  onError = () => {}
+  onError = () => {},
+  onEnd = () => {}
 ) {
   const recognition = new SR();
 
@@ -23,6 +24,10 @@ export default function useSpeechRecognition(
   recognition.onerror = (error) => {
     console.error(error);
     onError(error);
+  };
+
+  recognition.onend = () => {
+    onEnd();
   };
 
   return recognition;

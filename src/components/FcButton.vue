@@ -81,6 +81,11 @@ defineProps({
     rgba(50, 151, 211, 0.3) 0 0 0 4px;
 }
 
+.button-small {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+}
+
 .button-large {
   padding: 0.75rem;
   font-size: 1.25rem;

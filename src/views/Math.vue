@@ -9,7 +9,11 @@
         :b="currentEquation[1]"
         :answer="answer"
         :operation="selectedOperation"
-      />
+      >
+        <div v-if="answer || answer === 0" class="help-button-container">
+          <FcButton size="small" class="continue-button" @click="continueRound">continue</FcButton>
+        </div>
+      </MathCard>
     </div>
     <div v-else-if="!isStarted">
       <h2>What do you want to master?</h2>
@@ -72,6 +76,7 @@ import { shuffleArray } from "../utils/arrays";
 
 const { getAliases, aliasesByType } = useAliases();
 
+const helpTimeoutMS = 8000;
 const zeroThroughTwelve = [...Array(13)].map((_, i) => i);
 const oneThroughTwelve = zeroThroughTwelve.slice(1);
 
@@ -95,6 +100,8 @@ const availableOperations = Object.fromEntries(
       operation === operations.add || operation === operations.multiply
   )
 );
+
+let helpTimeout;
 
 // REACTIVE DATA
 const equations = ref([]);
@@ -152,16 +159,29 @@ const resetEquations = () => {
   completed.value = [];
 };
 
+const startHelptimer = () => {
+  clearTimeout(helpTimeout);
+  setTimeout(showHelp, helpTimeoutMS);
+};
+
 const startRound = () => {
   recognition.start();
   resetEquations();
   startTime.value = Date.now();
   totalTime.value = null;
+  startHelptimer();
 };
 
 const endRound = async () => {
-  recognition.stop();
   totalTime.value = Date.now() - startTime.value;
+  recognition.stop();
+};
+
+const showHelp = () => {
+  answer.value = correctSolution.value;
+  if (recognition) {
+    recognition.stop();
+  }
 };
 
 const attemptEquation = (solution) => {
@@ -178,13 +198,14 @@ const attemptEquation = (solution) => {
 
   answer.value = "";
   completed.value.unshift([...equations.value.shift(), numeric, isCorrect]);
+  startHelpTimer();
 };
 
 const recognition = useSpeechRecognition(
   // onResult
   (response) => {
     if (response === "help") {
-      answer.value = correctSolution.value;
+      showHelp();
       return;
     }
 
@@ -196,11 +217,32 @@ const recognition = useSpeechRecognition(
     }
   },
   // onError
+  (error) => {
+    showHelp();
+  },
+  // onEnd,
   () => {
-    startTime.value = null;
-    totalTime.value = null;
-  }
+    if (isRunning.value && !answer.value && answer.value !== 0) {
+      showHelp();
+    }
+    console.log('STOP')
+  },
 );
+
+recognition.onstart = () => {
+  console.log('START');
+};
+
+const continueRound = () => {
+  answer.value = "";
+  if (equations.value.length > 1) {
+    const equation = equations.value.shift();
+    equations.value.splice(Math.floor(Math.random() * equations.value.length + 1), 0, equation);
+  }
+
+  recognition.start();
+  startHelptimer();
+};
 
 onMounted(() => {
   getAliases("number");
@@ -229,5 +271,16 @@ onMounted(() => {
   font-size: 0.75rem;
   text-decoration: none;
   margin-left: 0.5rem;
+}
+
+.help-button-container {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  font-size: 14px;
+}
+
+.continue-button {
+  margin: 0;
 }
 </style>
