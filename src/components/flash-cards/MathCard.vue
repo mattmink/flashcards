@@ -7,6 +7,7 @@
       <span v-if="answer || answer === 0" class="answer-text">{{ answer }}</span>
       <span v-else>&nbsp;</span>
     </div>
+    <slot></slot>
   </FlashCard>
 </template>
 
