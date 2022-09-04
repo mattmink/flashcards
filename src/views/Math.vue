@@ -76,7 +76,7 @@ import { shuffleArray } from "../utils/arrays";
 
 const { getAliases, aliasesByType } = useAliases();
 
-const helpTimeoutMS = 8000;
+const helpTimeoutMS = 12000;
 const zeroThroughTwelve = [...Array(13)].map((_, i) => i);
 const oneThroughTwelve = zeroThroughTwelve.slice(1);
 
@@ -161,7 +161,7 @@ const resetEquations = () => {
 
 const startHelptimer = () => {
   clearTimeout(helpTimeout);
-  setTimeout(showHelp, helpTimeoutMS);
+  helpTimeout = setTimeout(showHelp, helpTimeoutMS);
 };
 
 const startRound = () => {
@@ -195,10 +195,10 @@ const attemptEquation = (solution) => {
     console.log(`Solution: ${correctSolution.value}\nI heard: "${solution}"`);
     return;
   }
-
+  
+  startHelptimer();
   answer.value = "";
   completed.value.unshift([...equations.value.shift(), numeric, isCorrect]);
-  startHelpTimer();
 };
 
 const recognition = useSpeechRecognition(
@@ -225,13 +225,8 @@ const recognition = useSpeechRecognition(
     if (isRunning.value && !answer.value && answer.value !== 0) {
       showHelp();
     }
-    console.log('STOP')
   },
 );
-
-recognition.onstart = () => {
-  console.log('START');
-};
 
 const continueRound = () => {
   answer.value = "";
