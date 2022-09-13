@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Toast :show="!!toastMessage" :type="toastMessage?.type">{{ toastMessage?.message }}</Toast>
     <h1>
       Math<span v-if="selectedOperation"> &ndash; {{ operationTitle }}</span>
     </h1>
@@ -76,6 +77,7 @@ import FcButton from "../components/FcButton.vue";
 import useAliases from "../composables/aliases";
 import { shuffleArray } from "../utils/arrays";
 import { stringUtils } from "../utils";
+import Toast from "../components/Toast.vue";
 
 const { getAliases, aliasesByType } = useAliases();
 
@@ -114,6 +116,7 @@ const selectedOperation = ref(null);
 const isTimeout = ref(false);
 const isUsingKeyboard = ref(false);
 const card = ref('card');
+const toastMessage = ref(null);
 
 // COMPUTED DATA
 const currentEquation = computed(() => equations.value[0]);
@@ -145,6 +148,13 @@ const numbersByAlias = computed(() => {
 });
 
 // METHODS
+const showToast = (message, type, clearDelay = 3000) => {
+  toastMessage.value = { message, type };
+  setTimeout(() => {
+    toastMessage.value = null;
+  }, clearDelay);
+};
+
 const resetEquations = () => {
   const equationBaseNumbers = workingOn.value.length ? workingOn.value : oneThroughTwelve;
 
@@ -211,9 +221,16 @@ const attemptEquation = (solution, isKeyedSolution) => {
   if (!isCorrect) {
     console.log(solution);
     console.log(`Solution: ${correctSolution.value}\nI heard: "${solution}"`);
+    if (Number.isNaN(numeric)) {
+      showToast(`Sorry, I couldn't understand you. Could you try again?`, 'error');
+    } else {
+      showToast(`"${numeric}" is not correct. Please try again!`, 'error');
+    }
     card.value.clear();
     return;
   }
+
+  showToast('Correct!', 'success', 800);
 
   answer.value = "";
   completed.value.unshift([...equations.value.shift(), numeric, isCorrect]);
