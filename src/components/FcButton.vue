@@ -1,8 +1,5 @@
 <template>
-  <button
-    :class="['button', { [`button-${size}`]: size !== 'medium' }]"
-    :disabled="disabled || loading"
-  >
+  <button :class="['button', { [`button-${size}`]: size !== 'medium', secondary }]" :disabled="disabled || loading">
     <span class="button--content">
       <slot></slot>
     </span>
@@ -29,6 +26,10 @@ defineProps({
     default: "medium",
     validator: (value) => ["small", "medium", "large"].includes(value),
   },
+  secondary: {
+    type: Boolean,
+    default: false,
+  },
 });
 </script>
 
@@ -39,8 +40,7 @@ defineProps({
   background-color: #405cf5;
   border-radius: 6px;
   border-width: 0;
-  box-shadow: rgba(50, 50, 93, 0.1) 0 0 0 1px inset,
-    rgba(50, 50, 93, 0.1) 0 2px 5px 0, rgba(0, 0, 0, 0.07) 0 1px 1px 0;
+  box-shadow: rgba(50, 50, 93, 0.1) 0 0 0 1px inset, rgba(50, 50, 93, 0.1) 0 2px 5px 0, rgba(0, 0, 0, 0.07) 0 1px 1px 0;
   box-sizing: border-box;
   color: #fff;
   cursor: pointer;
@@ -60,9 +60,17 @@ defineProps({
   touch-action: manipulation;
 }
 
+.button.secondary {
+  background-color: #33343d;
+}
+
 @media (hover: hover) {
   .button:hover {
     background-color: #5971f7;
+  }
+
+  .button.secondary:hover {
+    background-color: #484951;
   }
 }
 
@@ -71,13 +79,16 @@ defineProps({
   background-color: #6679e2;
 }
 
+.button.secondary:disabled {
+  background-color: #7c7d87;
+}
+
 .button:disabled .button--content {
   opacity: 0.5;
 }
 
 .button:focus {
-  box-shadow: rgba(50, 50, 93, 0.1) 0 0 0 1px inset,
-    rgba(50, 50, 93, 0.2) 0 6px 15px 0, rgba(0, 0, 0, 0.1) 0 2px 2px 0,
+  box-shadow: rgba(50, 50, 93, 0.1) 0 0 0 1px inset, rgba(50, 50, 93, 0.2) 0 6px 15px 0, rgba(0, 0, 0, 0.1) 0 2px 2px 0,
     rgba(50, 151, 211, 0.3) 0 0 0 4px;
 }
 
