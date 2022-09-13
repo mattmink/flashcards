@@ -4,8 +4,14 @@
       Math<span v-if="selectedOperation"> &ndash; {{ operationTitle }}</span>
     </h1>
     <div v-if="isRunning">
-      <MathCard :a="currentEquation[0]" :b="currentEquation[1]" :answer="answer" :operation="selectedOperation">
-        <!-- <div v-if="answer || answer === 0" class="help-button-container"> -->
+      <MathCard
+        :a="currentEquation[0]"
+        :b="currentEquation[1]"
+        :answer="answer"
+        :operation="selectedOperation"
+        @attempt="attemptEquation($event, true)"
+        ref="card"
+      >
         <div class="help-button-container">
           <FcButton v-if="answer || answer === 0" size="small" class="help-button" @click="continueRound"
             >continue</FcButton
@@ -69,6 +75,7 @@ import MathCard from "../components/flash-cards/MathCard.vue";
 import FcButton from "../components/FcButton.vue";
 import useAliases from "../composables/aliases";
 import { shuffleArray } from "../utils/arrays";
+import { stringUtils } from "../utils";
 
 const { getAliases, aliasesByType } = useAliases();
 
@@ -105,6 +112,8 @@ const workingOn = ref([]);
 const answer = ref(null);
 const selectedOperation = ref(null);
 const isTimeout = ref(false);
+const isUsingKeyboard = ref(false);
+const card = ref('card');
 
 // COMPUTED DATA
 const currentEquation = computed(() => equations.value[0]);
@@ -186,20 +195,35 @@ const hideTimeoutOverlay = (shouldShowHelp = true) => {
   }
 };
 
-const attemptEquation = (solution) => {
+const attemptEquation = (solution, isKeyedSolution) => {
+  if (stringUtils.isEmpty(solution)) return;
+  if (isKeyedSolution) {
+    isUsingKeyboard.value = true;
+    recognition.stop();
+  }
+
   const numeric = Number(solution);
   const isNumberAlias = numbersByAlias.value[solution] === String(correctSolution.value);
   const isCorrect = numeric === correctSolution.value || isNumberAlias;
+  console.log({ numeric, isNumberAlias, isCorrect, correctSolution: correctSolution.value });
 
   // TODO: Allow option to keep going when answered incorrectly
   if (!isCorrect) {
+    console.log(solution);
     console.log(`Solution: ${correctSolution.value}\nI heard: "${solution}"`);
+    card.value.clear();
+    return;
+  }
+
+  answer.value = "";
+  completed.value.unshift([...equations.value.shift(), numeric, isCorrect]);
+
+  if (!equations.value.length) {
+    endRound();
     return;
   }
 
   startHelptimer();
-  answer.value = "";
-  completed.value.unshift([...equations.value.shift(), numeric, isCorrect]);
 };
 
 const recognition = useSpeechRecognition(
@@ -211,11 +235,6 @@ const recognition = useSpeechRecognition(
     }
 
     attemptEquation(response);
-
-    if (equations.value.length === 0) {
-      endRound();
-      return;
-    }
   },
   // onError
   (error) => {
@@ -223,7 +242,7 @@ const recognition = useSpeechRecognition(
   },
   // onEnd,
   () => {
-    if (isRunning.value && !answer.value && answer.value !== 0) {
+    if (!isUsingKeyboard.value && isRunning.value && !answer.value && answer.value !== 0) {
       showTimeoutOverlay();
     }
   }
