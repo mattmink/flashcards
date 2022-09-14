@@ -18,6 +18,7 @@ async function getCurrentUser() {
     `);
     user.value = currentUser;
   } catch (error) {
+    setToken();
     user.value = null;
   }
 }

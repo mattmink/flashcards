@@ -7,7 +7,6 @@ const graphQLClient = new GraphQLClient(url);
 const guestKey = import.meta.env.VITE_FAUNA_GUEST_KEY;
 const FAUNA_TOKEN_COOKIE = "faunaTokenFlashCards";
 
-// TODO: Handle token expiration (TTL)
 // TODO: Investigate more secure approach for persisting session than cookies
 export function setToken(token = guestKey) {
   graphQLClient.setHeaders({
