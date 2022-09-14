@@ -95,7 +95,10 @@ defineExpose({ clear });
   font-variant: common-ligatures tabular-nums;
 }
 
-.a,
+.a {
+  grid-column-end: span 2;
+}
+
 .b {
   grid-column-start: 2;
 }
