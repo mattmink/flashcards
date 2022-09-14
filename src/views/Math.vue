@@ -34,7 +34,7 @@
     <div v-else-if="!isStarted">
       <h2>What do you want to master?</h2>
       <div v-if="!selectedOperation">
-        <FcButton v-for="(_, operation) in availableOperations" class="button" @click="selectedOperation = operation"
+        <FcButton v-for="(_, operation) in operations" class="button" @click="selectedOperation = operation"
           >{{ operationTitles[operation] }}<br /><span
             class="operation-button-character"
             v-html="operatorChars[operation]"
@@ -98,11 +98,6 @@ const operationTitles = {
   [operations.divide]: "Division",
 };
 
-// TODO: This is temporary. I need to add more logic to the resetEquations function for subtraction and division
-const availableOperations = Object.fromEntries(
-  Object.entries(operations).filter(([operation]) => operation === operations.add || operation === operations.multiply)
-);
-
 let helpTimeout;
 
 // REACTIVE DATA
@@ -158,7 +153,15 @@ const showToast = (message, type, clearDelay = 3000) => {
 const resetEquations = () => {
   const equationBaseNumbers = workingOn.value.length ? workingOn.value : oneThroughTwelve;
 
-  equations.value = shuffleArray(equationBaseNumbers.flatMap((a) => zeroThroughTwelve.map((b) => [a, b])));
+  equations.value = shuffleArray(equationBaseNumbers.flatMap((a) => zeroThroughTwelve.map((b) => {
+    let firstNumber = b;
+    if (selectedOperation.value === operations.divide) {
+      firstNumber = operationFns[operations.multiply](a, b);
+    } else if (selectedOperation.value === operations.subtract) {
+      firstNumber = operationFns[operations.add](a, b);
+    }
+    return [firstNumber, a];
+  })));
   completed.value = [];
 };
 
@@ -215,12 +218,8 @@ const attemptEquation = (solution, isKeyedSolution) => {
   const numeric = Number(solution);
   const isNumberAlias = numbersByAlias.value[solution] === String(correctSolution.value);
   const isCorrect = numeric === correctSolution.value || isNumberAlias;
-  console.log({ numeric, isNumberAlias, isCorrect, correctSolution: correctSolution.value });
 
-  // TODO: Allow option to keep going when answered incorrectly
   if (!isCorrect) {
-    console.log(solution);
-    console.log(`Solution: ${correctSolution.value}\nI heard: "${solution}"`);
     if (Number.isNaN(numeric)) {
       showToast(`Sorry, I couldn't understand you. Could you try again?`, 'error');
     } else {
