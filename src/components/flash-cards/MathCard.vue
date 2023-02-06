@@ -5,10 +5,9 @@
     <div class="number b">{{ b }}</div>
     <div class="number answer">
       <span v-if="answer || answer === 0" class="answer-text">{{ answer }}</span>
-      <form v-else-if="user.name !== 'Hunter'" class="answer-input" @submit.prevent="attempt">
+      <form v-else class="answer-input" @submit.prevent="attempt">
         <input type="text" maxlength="3" v-model="innerValue" @keydown="handleKeydown" ref="input" />
       </form>
-      <span v-else>&nbsp;</span>
     </div>
     <slot></slot>
   </FlashCard>
