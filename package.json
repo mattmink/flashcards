@@ -8,8 +8,8 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "fauna": "^2.2.0",
     "graphql": "^16.5.0",
-    "graphql-request": "^4.2.0",
     "vue": "^3.2.33",
     "vue-router": "^4.0.15"
   },

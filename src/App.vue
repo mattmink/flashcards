@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { RouterView } from "vue-router";
 import useAuth from "./composables/auth";
 import useLoading from "./composables/loading";
@@ -23,12 +23,14 @@ import LoginForm from "./components/LoginForm.vue";
 import LoadingOverlay from "./components/LoadingOverlay.vue";
 import MainNav from "./components/MainNav.vue";
 
-const { user, getCurrentUser } = useAuth();
+const { user } = useAuth();
 const { isLoading } = useLoading();
 const isInitialLoading = ref(true);
 
-getCurrentUser().finally(() => {
-  isInitialLoading.value = false;
+onMounted(() => {
+  setTimeout(() => {
+    isInitialLoading.value = false
+  }, 3000)
 });
 </script>
 

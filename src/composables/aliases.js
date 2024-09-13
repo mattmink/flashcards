@@ -1,22 +1,16 @@
-import { gql } from "graphql-request";
 import { reactive } from "vue";
-import { makeGQLObject, mutation, query } from "../db";
+import { query } from "../db";
+import { fql } from "fauna";
 import useAuth from "./auth";
 
-const { withOwner } = useAuth();
 const aliasesByType = reactive({
   number: [],
 });
 
 const getAliases = async (type) => {
   if (!aliasesByType[type] || aliasesByType[type].length) return aliasesByType[type];
-
   try {
-    const {
-      speechAliasesByType: { data },
-    } = await query(
-      gql`speechAliasesByType(type:"${type}") { data { value, alias, type }}`
-    );
+    const { data: { data } } = await query(fql`SpeechAlias.all().where(SpeechAlias => SpeechAlias.type == ${type}){ value, alias, type }`);
     aliasesByType[type] = data;
   } catch (error) {
     // fail silently when getting aliases. this is not core functionality.
@@ -27,6 +21,7 @@ const getAliases = async (type) => {
 
 const createAlias = async ({ value, alias, type }) => {
   const aliasType = aliasesByType[type];
+  const { user } = useAuth();
 
   if (
     !aliasType ||
@@ -36,12 +31,15 @@ const createAlias = async ({ value, alias, type }) => {
   }
 
   aliasType.push({ value, alias, type });
+  console.log({ value, alias, type });
 
   try {
-    const newAlias = makeGQLObject(withOwner({ value, alias, type }));
-    await mutation(
-      gql`createSpeechAlias(data:${newAlias}) { value, alias, type }`
-    );
+    await query(fql`SpeechAlias.create({
+      type: ${type},
+      value: ${value},
+      alias: ${alias},
+      owner: User.byId(${user.value.id})
+    })`)
   } catch (error) {}
 };
 

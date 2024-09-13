@@ -1,92 +1,23 @@
-import { ref } from "vue";
-import { gql } from "graphql-request";
-import { request, setToken } from "../db";
-import useLoading from "./loading";
+import { computed, ref } from "vue";
+import { clearAuth, query, setAuth } from "../db";
+import { fql } from "fauna";
 
-const user = ref(null);
-const { setLoading, clearLoading } = useLoading();
+const user = ref(JSON.parse(localStorage.getItem('user')) || null);
 
-async function getCurrentUser() {
-  try {
-    const { currentUser } = await request(gql`
-      query {
-        currentUser {
-          name
-          _id
-        }
-      }
-    `);
-    user.value = currentUser;
-  } catch (error) {
-    setToken();
-    user.value = null;
-  }
-}
-
-async function login(name, password) {
-  if (!name || !password) return;
-
-  setLoading();
-
-  try {
-    const { loginUser: token } = await request(gql`
-      mutation {
-        loginUser(input: {
-          name: "${name}",
-          password: "${password}"
-        })
-      }
-    `);
-    setToken(token);
-    await getCurrentUser();
-  } catch (error) {
-    setToken();
-    throw new Error(error);
-  }
-  
-  clearLoading();
-}
-
-async function register(name, password) {
-  if (!name || !password) return null;
-
-  const { createUser: userDetails } = await request(gql`
-    mutation {
-      createUser(input: {
-        name: "${name}",
-        password: "${password}"
-      }) { name }
-    }
-  `);
-
-  return userDetails;
+async function login(u) {
+  if (!u) return;
+  const { data: { secret } } = await query(fql`loginUser(${u.id})`)
+  setAuth(secret);
+  localStorage.setItem('user', JSON.stringify(u));
+  user.value = u;
 }
 
 async function logout() {
-  setLoading();
-
-  await request(
-    gql`
-      mutation {
-        logoutUser
-      }
-    `
-  );
-  setToken();
+  clearAuth();
+  localStorage.removeItem('user');
   user.value = null;
-
-  clearLoading();
-}
-
-function withOwner(obj = {}) {
-  return {
-    ...obj,
-    owner: {
-      connect: user.value._id,
-    },
-  };
 }
 
 export default function useAuth() {
-  return { user, getCurrentUser, register, login, logout, withOwner };
+  return { user: computed(() => user.value), login, logout };
 }
